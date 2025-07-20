@@ -97,7 +97,16 @@
 // Drawings //
 //////////////
 
-#let blur-cross(
+/// Produce blurring texts on any orthogonal direction.
+///
+/// - steps (dictionary): The number of steps to take in each direction.
+/// - shifts (dictionary): The length of each step om each direction.
+/// - orig (auto, content): The content that will take the space and be at the original place. Leave this `auto` and `body` not a `function` to automatically fill this space.
+/// - body (function, any): The blurred content.
+///   - `function` → takes `(dir, step, step-max)` where `dir` is a string of "left", "right", "top" or "bottom", `step` is the step it is on in that direction, and `step-max` is the number of steps that is going to be taken in that direction.
+///   - anything but `function` → only works when `orig` is `auto`; it is converted to a function that uses `text.fill` to blur.
+/// -> content
+#let blur-orth(
   steps: (
     left: 2,
     right: 2,
@@ -105,10 +114,10 @@
     bottom: 2,
   ),
   shifts: (
-    left: 2pt,
-    right: 2pt,
-    top: 1pt,
-    bottom: 1pt,
+    left: .05em,
+    right: .05em,
+    top: .025em,
+    bottom: .025em,
   ),
   orig: auto,
   body,
@@ -134,4 +143,18 @@
       .flatten()
       .join()
   })
+}
+
+
+#let dash-orth(
+  dir,
+  length: 1em,
+  orig: auto,
+  body,
+) = {
+  if orig == auto and type(body) != function {
+    orig = body
+    body = (step, step-max) => text(fill: black.transparentize(lerp(70%, 90%, step / step-max)), body)
+  }
+  //TODO
 }

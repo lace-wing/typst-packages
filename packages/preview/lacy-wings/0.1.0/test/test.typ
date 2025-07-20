@@ -2,8 +2,13 @@
 #import data: *
 #import drawing: *
 
-www#blur-cross[www]www
 
+#set text(size: 2cm)
+
+www#blur-orth[www]www
+
+
+/*
 #let sheep(id, f, m) = Right((
   id: id,
   father: f,

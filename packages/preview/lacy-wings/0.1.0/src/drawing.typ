@@ -99,8 +99,8 @@
 
 #let blur-cross(
   steps: (
-    left: 3,
-    right: 3,
+    left: 2,
+    right: 2,
     top: 2,
     bottom: 2,
   ),
@@ -115,7 +115,7 @@
 ) = {
   if orig == auto and type(body) != function {
     orig = body
-    body = (dir, step) => text(fill: black.transparentize(lerp(70%, 90%, step / steps.at(dir))), body)
+    body = (dir, step, step-max) => text(fill: black.transparentize(lerp(70%, 90%, step / step-max)), body)
   }
   spaced(orig, {
     place(orig)
@@ -129,7 +129,7 @@
           ("top", (dy: s * shifts.at(k) * -1)),
           ("bottom", (dy: s * shifts.at(k))),
         ),
-        body(k, s),
+        body(k, s, steps.at(k)),
       )))
       .flatten()
       .join()

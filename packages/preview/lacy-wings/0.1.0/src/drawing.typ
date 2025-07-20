@@ -154,7 +154,34 @@
 ) = {
   if orig == auto and type(body) != function {
     orig = body
-    body = (step, step-max) => text(fill: black.transparentize(lerp(70%, 90%, step / step-max)), body)
+    body = (step, step-max) => text(fill: black.transparentize(lerp(95%, 80%, step / step-max)), body)
   }
-  //TODO
+  spaced(orig, context {
+    let step = calc.floor(length.to-absolute() / .2em.to-absolute())
+    let shift = length / step
+    // after images
+    range(0, step)
+      .map(s => place(
+        ..case(
+          dir,
+          ("left", (dx: s * shift * -1)),
+          ("right", (dx: s * shift)),
+          ("top", (dy: s * shift * -1)),
+          ("bottom", (dy: s * shift)),
+        ),
+        body(s, step),
+      ))
+      .join()
+    // orig
+    place(
+      ..case(
+        dir,
+        ("left", (dx: length * -1)),
+        ("right", (dx: length)),
+        ("top", (dy: length * -1)),
+        ("bottom", (dy: length)),
+      ),
+      orig,
+    )
+  })
 }

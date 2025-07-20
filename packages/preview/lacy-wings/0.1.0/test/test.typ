@@ -2,10 +2,17 @@
 #import data: *
 #import drawing: *
 
-
 #set text(size: 2cm)
 
-www#blur-orth[www]www
+www#blur-orth[www]
+
+中文#blur-orth[中文]
+
+中文#dash-orth("bottom")[中文]中文
+
+www#dash-orth("right")[www]
+
+#dash-orth("left")[中文]中文
 
 
 /*

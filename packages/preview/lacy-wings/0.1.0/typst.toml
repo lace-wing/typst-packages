@@ -1,0 +1,12 @@
+[package]
+name = "lacy-wings"
+version = "0.1.0"
+compiler = "0.13.0"
+entrypoint = "src/export.typ"
+authors = ["Lacewing <@lace-wing>"]
+license = "MIT"
+description = "Lacewing's Utilities."
+repository = "https://github.com/lace-wing/lacy-wings.typ"
+keywords = ["utility", "lacy", "wings"]
+categories = ["utility", "scripting", "layout", "components", "language"]
+exclude = ["test"]

@@ -2,29 +2,26 @@
 #import data: *
 #import drawing: *
 
-#set text(size: 2cm)
+#let str2int(s) = if s.clusters().all(c => c.match(regex("\d")) != none) {
+  Just(int(s))
+} else {
+  Nothing("`str2int` failed.")
+}
 
-www#blur-orth[www]
+#map-m(str2int, "1", "567", "1314520")
 
-中文#blur-orth[中文]
-
-中文#dash-orth("bottom")[中文]中文
-
-www#dash-orth("right")[www]
-
-#dash-orth("left")[中文]中文
-
+#map-m(str2int, "1", "刺客", "1314520")
 
 /*
-#let sheep(id, f, m) = Right((
+#let sheep(id, f, m) = Just((
   id: id,
   father: f,
   mother: m,
 ))
 
-#let gf = sheep(0, Left("no dad"), Left("no mom"))
-#let f = sheep(1, Left("no dad"), Left("no mom"))
-#let m = sheep(2, gf, Left("no mom"))
+#let gf = sheep(0, Nothing("no dad"), Nothing("no mom"))
+#let f = sheep(1, Nothing("no dad"), Nothing("no mom"))
+#let m = sheep(2, gf, Nothing("no mom"))
 #let i = sheep(3, f, m)
 
 #let father(s) = s.father
@@ -37,7 +34,6 @@ www#dash-orth("right")[www]
   father,
 )
 
-#context here().position()
 // gm (none)
 #bind(
   i,

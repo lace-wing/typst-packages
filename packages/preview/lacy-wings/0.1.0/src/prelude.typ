@@ -78,19 +78,6 @@
     }))
 )
 
-/// Compose a series of functions and execute with arguments.
-///
-/// - args (any): Arguments for the composed function, are turned to an `arguments` if not one already.
-/// - funcs (arguments): The functions to be composed, left-to-right.
-/// -> any
-#let compose_(args, ..funcs) = (compose(..funcs))(..{
-  if type(args) == arguments {
-    args
-  } else {
-    arguments(args)
-  }
-})
-
 //////////
 // Data //
 //////////
@@ -148,21 +135,21 @@
     }
   }
 
-  let (_, action) = cases
+  let ca = cases
     .pos()
     .find(((ctor, _)) => {
       if type(ctor) == function { ctor = repr(ctor) }
       ctor == subject.ctor
     })
-  if action == none {
+  if ca == none {
     val-or-call(default)
   } else {
-    action(..subject.values)
+    ca.at(1)(..subject.values)
   }
 }
 
 /// Data definitions.
-#let Data = (
+#let DataDef = (
   Maybe: (
     "Just",
     "Nothing",
@@ -174,7 +161,7 @@
 /// - val (any): The value to test.
 /// -> str, none
 #let get-data(val) = if cnsted(val) {
-  let p = Data.pairs().find(((_, inss)) => inss.contains(val.ctor))
+  let p = DataDef.pairs().find(((_, inss)) => inss.contains(val.ctor))
   if p == none { return none }
   p.at(0)
 }
@@ -204,6 +191,7 @@
 }
 
 /// Left-to-right chain combinator.
+/// Specifically handles `Maybe`, for now.
 ///
 /// ```example
 /// // Find Dolly's grandfather.
@@ -214,22 +202,38 @@
 /// ) // → `Nothing()`, she's a clone!
 /// ```
 ///
-/// - ma (dictionary): A `Maybe` data, `Just` or `Nothing`.
-/// - ambs (arguments): Functions that build `Maybe`.
+/// - ma (dictionary): A monadic value.
+/// - ambs (arguments): Monadic functions.
 /// -> dictionary
 #let bind(ma, ..ambs) = (ma, ..ambs.pos()).reduce((ma, amb) => ctors(
   ma,
   (Just, a => amb(a)),
   (Nothing, _ => ma),
-  default: Nothing(),
+  default: (..args) => amb(..args),
 ))
+
+/// Left-to-right chain combinator, but ignore binds that produce `Nothing` and moves on.
+///
+/// - ma (dictionary): A monadic value.
+/// - ambs (arguments): Monadic functions.
+/// -> dictionary
+#let bind_(ma, ..ambs) = (ma, ..ambs.pos()).reduce((ma, amb) => {
+  let mb = ctors(ma, (Just, a => amb(a)), (Nothing, _ => ma), default: (..args) => amb(..args))
+
+  ctors(
+    mb,
+    (Nothing, _ => ma),
+    default: mb,
+  )
+})
 
 /// Turn a list of monadic values into a monadic list. Short-circuits on `Nothing`.
 /// For now, specifically handles only `Maybe`.
 ///
 /// - mas (arguments): Monadic values to be sequenced.
-/// -> array
-#let sequence(..mas) = {
+/// - m (function, none): Optional monadic function for custom data not defined in `DataDef`.
+/// -> dictionary
+#let sequence(..mas, m: none) = {
   mas = mas.pos()
   let d = get-data(mas.at(0))
   if (
@@ -255,15 +259,59 @@
     )
   })
   if sht { Nothing(seq) } else {
-    case(call-out: true, call-default: true, d, ("Maybe", () => Just(seq)), default: () => panic(
-      "Unsupported data `" + d + "`, yet.",
-    ))
+    case(call-out: true, call-default: true, d, ("Maybe", () => Just(seq)), default: () => if type(m) == function {
+      m(seq)
+    } else {
+      panic(
+        "Unsupported data `" + d + "`, yet.",
+      )
+    })
   }
 }
 
-/// `sequence . map`.
+/// Turn a list of monadic values into a monadic list. Ignores `Nothing`.
+/// For now, specifically handles only `Maybe`.
+///
+/// - mas (arguments): Monadic values to be sequenced.
+/// - m (function, none): Optional monadic function for custom data not defined in `DataDef`.
+/// -> dictionary
+#let sequence_(..mas, m: none) = {
+  mas = mas.pos()
+  let d = get-data(mas.at(0))
+  if (
+    mas.fold(d, (t, ma) => {
+      if d == none { return none }
+      let dma = get-data(ma)
+      if d != dma { return none }
+      dma
+    })
+      == none
+  ) {
+    panic("Unconforming data for `sequence`!")
+  }
+  let (seq) = mas.fold((), (seq, ma) => {
+    ctors(ma, (Just, a => seq + (a,)), (Nothing, a => seq), default: (..a) => seq + (a.pos(),))
+  })
+  case(call-out: true, call-default: true, d, ("Maybe", () => Just(seq)), default: () => if type(m) == function {
+    m(seq)
+  } else {
+    panic(
+      "Unsupported data `" + d + "`, yet.",
+    )
+  })
+}
+
+/// `sequence . map`
 ///
 /// - amb (function): A `function` that builds `m b` from `a` in `arr`.
 /// - arr (arguments): Items that `amb` will process.
 /// -> dictionary
-#let map-m(amb, ..arr) = sequence(..arr.pos().map(a => amb(a)))
+#let mapm(amb, ..arr) = sequence(..arr.pos().map(a => amb(a)))
+
+
+/// `sequence_ . map`
+///
+/// - amb (function): A `function` that builds `m b` from `a` in `arr`.
+/// - arr (arguments): Items that `amb` will process.
+/// -> dictionary
+#let mapm_(amb, ..arr) = sequence_(..arr.pos().map(a => amb(a)))

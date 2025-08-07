@@ -4,7 +4,7 @@ An opinionated utility library.
 ## Features
 - [x] Composing functions.
 - [x] Drawing blurred or dashing texts.
-- [ ] Short-circuit and pass-through `Maybe` and `Either`.
+- [x] Short-circuit and pass-through `Maybe` and `Either`.
 - [ ] Chinese and CJK-Latin language setup.
 
 ## Credits

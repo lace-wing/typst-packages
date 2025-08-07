@@ -6,8 +6,8 @@
 /// ```example
 /// #ctors(
 ///   maybe-dict(a),
-///   ("just", a => [It is a dictionary.]),
-///   ("nothing", () => [It is nothing])
+///   ("Just", a => [It is a dictionary.]),
+///   ("Nothing", () => [It is nothing])
 /// )
 /// ```
 ///
@@ -18,10 +18,17 @@
   case(
     call-out: true,
     t,
-    (dictionary, just(value)),
-    (array, () => just(value.to-dict())),
-    (module, () => just(dictionary(value))),
-    (arguments, () => just(value.named())),
+    (dictionary, Just(value)),
+    (
+      array,
+      () => if value.all(el => type(el) == array and el.len() == 2 and type(el.at(0)) == str) {
+        Just(value.to-dict())
+      } else {
+        Nothing()
+      },
+    ),
+    (module, () => Just(dictionary(value))),
+    (arguments, () => Just(value.named())),
     (function, () => try-dict(value())),
     default: Nothing(),
   )
@@ -73,3 +80,4 @@
 #let merge-configs(..conf) = merge-dicts(..conf
   .pos()
   .map(c => if type(c) == module { to-dict(c).at("config", default: (:)) } else { to-dict(c) }))
+

@@ -8,11 +8,24 @@
   Nothing("`str2int` failed.")
 }
 
-#map-m(str2int, "1", "567", "1314520")
-
-#map-m(str2int, "1", "刺客", "1314520")
+// #mapm(str2int, "1", "567", "1314520")
+//
+// #mapm_(str2int, "1", "567", "1314520")
+//
+// #mapm(str2int, "1", "刺客", "1314520")
+//
+// #mapm_(str2int, "1", "刺客", "1314520")
+//
+// #sequence(..("1", "567", "1314520").map(s => str2int(s)))
+//
+// #sequence_(..("1", "567", "1314520").map(s => str2int(s)))
+//
+// #sequence(..("1", "刺客", "1314520").map(s => str2int(s)))
+//
+// #sequence_(..("1", "刺客", "1314520").map(s => str2int(s)))
 
 /*
+
 #let sheep(id, f, m) = Just((
   id: id,
   father: f,
@@ -28,16 +41,43 @@
 #let mother(s) = s.mother
 
 // gf
+bind (shorting):
 #bind(
   i,
   mother,
   father,
 )
 
+// gf
+bind\_ (passing):
+#bind_(
+  i,
+  mother,
+  father,
+  father,
+  father,
+)
+
 // gm (none)
+bind:
 #bind(
   i,
   mother,
   mother,
 )
 
+// gm (none)
+bind\_:
+#bind_(
+  i,
+  mother,
+  mother,
+  mother,
+  mother,
+)
+
+*/
+
+#let dct = (("1", 2), ("3", 4))
+
+#maybe-dict(dct)

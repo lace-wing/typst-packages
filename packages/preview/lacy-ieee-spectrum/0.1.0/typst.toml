@@ -1,0 +1,18 @@
+[package]
+name = "lacy-ieee-spectrum"
+version = "0.1.0"
+compiler = "0.13.0"
+entrypoint = "src/export.typ"
+authors = ["Lacewing <@lace-wing>"]
+license = "MIT"
+description = "An IEEE Spectrum theme."
+repository = "https://github.com/lace-wing/lacy-ieee-spectrum.typ"
+keywords = ["IEEE", "IEEE Spectrum", "magazine"]
+categories = ["book", "layout", "components", "utility"]
+disciplines = ["education", "electrical", "electronics", "engineering"]
+exclude = ["test"]
+
+[template]
+path = "template"
+entrypoint = "template/main.typ"
+thumbnail = "docs/thumbnail-light.svg"
